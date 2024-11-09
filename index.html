@@ -12,7 +12,6 @@
             font-family: 'Roboto', sans-serif;
             background-color: #f5f5f5;
         }
-        /* Estilo do Container */
         .container {
             max-width: 600px;
             margin: 30px auto;
@@ -21,7 +20,6 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
-        /* Estilo do Mapa */
         #map {
             height: 400px;
             width: 100%;
@@ -38,16 +36,13 @@
         <div id="map"></div>
     </div>
 
-    <!-- Google Maps API com Places Library -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=CHAVE_API&libraries=places&callback=initMap" async defer></script>
     <script>
         let map;
         let service;
         let userLocation;
-        let markers = []; // Array para armazenar os marcadores
+        let markers = [];
 
         function initMap() {
-            // Tenta obter a localização do usuário
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     userLocation = {
@@ -55,30 +50,26 @@
                         lng: position.coords.longitude,
                     };
 
-                    // Inicializando o mapa centrado na localização do usuário
                     map = new google.maps.Map(document.getElementById("map"), {
                         center: userLocation,
                         zoom: 15,
                     });
 
-                    // Adicionando um marcador para a localização do usuário
                     new google.maps.Marker({
                         position: userLocation,
                         map: map,
                         title: "Você está aqui",
                         icon: {
-                            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Ícone para a localização do usuário
-                            scaledSize: new google.maps.Size(40, 40) // Ajusta o tamanho do ícone
+                            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                            scaledSize: new google.maps.Size(40, 40)
                         }
                     });
 
-                    // Inicializando o serviço de busca de lugares
                     service = new google.maps.places.PlacesService(map);
                 }, () => {
                     handleLocationError(true);
                 });
             } else {
-                // Geolocalização não é suportada
                 handleLocationError(false);
             }
         }
@@ -87,56 +78,49 @@
             alert(browserHasGeolocation ?
                 "Erro: O serviço de geolocalização falhou." :
                 "Erro: Seu navegador não suporta geolocalização.");
-            // Centraliza o mapa em São Paulo como fallback
             userLocation = { lat: -23.55052, lng: -46.6333 };
             initMap();
         }
 
-        // Função para limpar marcadores anteriores
         function clearMarkers() {
             markers.forEach(marker => {
-                marker.setMap(null); // Remove o marcador do mapa
+                marker.setMap(null);
             });
-            markers = []; // Limpa o array de marcadores
+            markers = [];
         }
 
-        // Função para buscar locais com base no input do usuário
         function searchPlaces() {
             const input = document.getElementById("place-input").value;
 
-            // Busca de locais no raio de 1500 metros
             service.nearbySearch(
                 {
-                    location: userLocation, // Usando a localização do usuário
+                    location: userLocation,
                     radius: 1500,
-                    keyword: input, // Usando o input do usuário como palavra-chave
+                    keyword: input,
                 },
                 (results, status) => {
                     if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                        clearMarkers(); // Limpa marcadores anteriores antes de adicionar novos
+                        clearMarkers();
 
                         results.forEach((place) => {
                             const marker = new google.maps.Marker({
                                 position: place.geometry.location,
                                 map: map,
                                 title: place.name,
-                                // Usando ícone padrão do Google Maps para os locais encontrados
                                 icon: {
-                                    url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Ícone para os locais encontrados
-                                    scaledSize: new google.maps.Size(30, 30) // Ajusta o tamanho do ícone
+                                    url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                                    scaledSize: new google.maps.Size(30, 30)
                                 }
                             });
 
-                            // Adiciona o marcador ao array
                             markers.push(marker);
 
-                            // Exibindo informações do local ao clicar no marcador
                             google.maps.event.addListener(marker, "click", () => {
-                                alert(
-                                    Nome: ${place.name}\n +
-                                    Endereço: ${place.vicinity}\n +
-                                    Avaliação: ${place.rating}
-                                );
+                                alert(`
+                                    Nome: ${place.name}
+                                    Endereço: ${place.vicinity}
+                                    Avaliação: ${place.rating || 'N/A'}
+                                `);
                             });
                         });
                     }
@@ -144,8 +128,10 @@
             );
         }
 
-        // Adiciona o evento de clique no botão de busca
         document.getElementById("search-button").addEventListener("click", searchPlaces);
     </script>
+
+    <!-- Google Maps API com Places Library -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API&libraries=places&callback=initMap" async defer></script>
 </body>
 </html>
